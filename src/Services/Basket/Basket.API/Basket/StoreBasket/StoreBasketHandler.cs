@@ -13,7 +13,7 @@ namespace Basket.API.Basket.StoreBasket
         }
     }
 
-    public class StoreBasketCommandHandler
+    public class StoreBasketCommandHandler(IBasketRespository repository)
         : ICommandHandler<StoreBasketCommand,StoreBasketResult>
     {
         public async Task<StoreBasketResult> Handle(StoreBasketCommand command, CancellationToken cancellationToken)
@@ -22,8 +22,8 @@ namespace Basket.API.Basket.StoreBasket
 
             //TODO Store in DB
             //TODO Update chash
-
-            return new StoreBasketResult("swn");
+            await repository.StoreBasket(command.Cart);
+            return new StoreBasketResult(command.Cart.UserName);
         }
     }
 }
