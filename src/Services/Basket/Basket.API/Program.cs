@@ -1,4 +1,5 @@
 
+using Discount.Grps;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //Add services to the container.
 
+//Aplication Services
 var assembly = typeof(Program).Assembly;
 
 builder.Services.AddCarter();
@@ -18,6 +20,7 @@ builder.Services.AddMediatR(config =>
     config.AddOpenBehavior(typeof(LoggingBahavior<,>));
 });
 
+//Data Services
 builder.Services.AddMarten(opts =>
 {
     opts.Connection(builder.Configuration.GetConnectionString("Database")!);
@@ -33,6 +36,14 @@ builder.Services.AddStackExchangeRedisCache(opts =>
     //opts.InstanceName = "Basket";
 });
 
+
+//Grpc Services
+builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(opts =>
+{
+    opts.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"]!);
+});
+
+//Cross-Cutting Services
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder.Services.AddHealthChecks()
